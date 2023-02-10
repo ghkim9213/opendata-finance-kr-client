@@ -54,10 +54,15 @@ class VariableClient:
             return data
         return pd.DataFrame.from_records(data.get('records')) # 데이터프레임으로 변환
 
-    def download_variable_panel(self, variable_name):
-        var = self.find_variable_by_name(variable_name)  # 지표 선택
-        requests.get(var['download_url'])                 # 다운로드
-        return None
+    def get_panel(self, variable_name):
+        var = self.find_variable_by_name(variable_name)
+        res = requests.get(var['download_url'])
+        zf = zipfile.ZipFile(BytesIO(res.content))
+        csv_filename = zf.namelist()[0]
+        with zf.open(csv_filename) as f:
+            encoded = f.read()
+            decoded = encoded.decode('utf-8')
+        return pd.read_csv(StringIO(decoded))
 
 
     def find_variable_by_name(self, name):
