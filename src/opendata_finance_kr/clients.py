@@ -62,7 +62,9 @@ class VariableClient:
         with zf.open(csv_filename) as f:
             encoded = f.read()
             decoded = encoded.decode('utf-8')
-        return pd.read_csv(StringIO(decoded))
+        panel = pd.read_csv(StringIO(decoded))
+        panel.stock_code = panel.stock_code.astype(str).str.zfill(6)
+        return panel
 
 
     def find_variable_by_name(self, name):
